@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.propertymanagment.server.config.JwtService
 import com.propertymanagment.server.token.Token
 import com.propertymanagment.server.token.TokenRepository
-import com.propertymanagment.server.token.TokenType
 import com.propertymanagment.server.user.Role
 import com.propertymanagment.server.user.User
 import com.propertymanagment.server.user.UserRepository
