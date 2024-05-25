@@ -1,5 +1,6 @@
 package com.propertymanagment.server.user
 
+import com.propertymanagment.server.token.Token
 import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -16,8 +17,12 @@ data class User(
         val phoneNumber: String,
         val email: String,
         private val password: String,
+
         @Enumerated(EnumType.STRING)
-        val role: Role
+        val role: Role,
+
+        @OneToMany(mappedBy = "user")
+        val tokens: List<Token> = emptyList()
 ) : UserDetails {
         override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
                 mutableListOf(SimpleGrantedAuthority(role.name))

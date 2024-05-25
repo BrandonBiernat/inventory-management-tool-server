@@ -1,5 +1,6 @@
 package com.propertymanagment.server.config
 
+import com.propertymanagment.server.token.TokenRepository
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -15,7 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtAuthenticationFilter(
         private val jwtService: JwtService,
-        private val userDetailsService: UserDetailsService
+        private val userDetailsService: UserDetailsService,
+        private val tokenRepository: TokenRepository
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
             @NonNull request: HttpServletRequest,
@@ -35,7 +37,10 @@ class JwtAuthenticationFilter(
         val userEmail: String = jwtService.extractUsername(jwt)
         if(userEmail != null && SecurityContextHolder.getContext().authentication == null) {
             val userDetails: UserDetails = this.userDetailsService.loadUserByUsername(userEmail)
-            if(jwtService.isTokenValid(jwt, userDetails)) {
+            val isTokenValid: Boolean = tokenRepository.findByToken(jwt)
+                .map { !it.loggedOut }
+                .orElse(false)
+            if(jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 val authToken: UsernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

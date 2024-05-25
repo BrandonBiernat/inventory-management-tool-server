@@ -1,5 +1,7 @@
 package com.propertymanagment.server.auth
 
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,4 +20,10 @@ class AuthController(
     @PostMapping("/authenticate")
     fun authenticate(@RequestBody request: AuthRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok().body(authenticationService.authenticate(request))
+
+    @PostMapping("/refresh-token")
+    fun refreshToken(
+        request: HttpServletRequest,
+        response: HttpServletResponse
+    ) = authenticationService.refreshToken(request, response)
 }

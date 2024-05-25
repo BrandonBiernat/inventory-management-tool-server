@@ -1,5 +1,6 @@
 package com.propertymanagment.server.config
 
+import com.propertymanagment.server.user.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -14,7 +15,8 @@ import java.util.function.Function
 @Service
 class JwtService {
     private val secretKey: String = "5172513463384D6E4231744F39556F77556A366846577145496A696370674561"
-    private val jwtExpiration: Long = 600000
+    private val jwtExpiration: Long = 1000 * 60 * 60 * 24
+    private val refreshExpiration: Long = 1000 * 60 * 60 * 24
 
     fun extractUsername(token: String): String =
             extractClaim(token, Claims::getSubject)
@@ -24,16 +26,13 @@ class JwtService {
         return claimsResolver(claims)
     }
 
-    fun generateToken(userDetails: UserDetails): String {
-        return generateToken(emptyMap(), userDetails)
-    }
+    fun generateToken(userDetails: UserDetails): String =
+        generateToken(emptyMap(), userDetails)
 
     fun generateToken(
             extraClaims: Map<String, Any>,
             userDetails: UserDetails
-    ): String {
-        return buildToken(extraClaims, userDetails, jwtExpiration)
-    }
+    ): String = buildToken(extraClaims, userDetails, jwtExpiration)
 
     private fun buildToken(
             extraClaims: Map<String, Any>,
@@ -54,13 +53,11 @@ class JwtService {
         return (username == userDetails.username) && !isTokenExpired(token)
     }
 
-    private fun isTokenExpired(token: String): Boolean {
-        return extractExpiration(token).before(Date())
-    }
+    private fun isTokenExpired(token: String): Boolean =
+        extractExpiration(token).before(Date())
 
-    private fun extractExpiration(token: String): Date {
-        return extractClaim(token, Claims::getExpiration)
-    }
+    private fun extractExpiration(token: String): Date =
+        extractClaim(token, Claims::getExpiration)
 
     private fun extractAllClaims(token: String): Claims {
         return Jwts.parserBuilder()
@@ -74,4 +71,7 @@ class JwtService {
         val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey)
         return Keys.hmacShaKeyFor(keyBytes)
     }
+
+    fun generateRefreshToken(user: UserDetails): String =
+        buildToken(emptyMap(), user, refreshExpiration)
 }
