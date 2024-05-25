@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class CustomLogoutHandler(
@@ -26,6 +27,7 @@ class CustomLogoutHandler(
             .orElse(null)
         if(jwtToken != null) {
             storedToken.loggedOut = true
+            storedToken.expirationDate = LocalDateTime.now()
             tokenRepository.save(storedToken)
             SecurityContextHolder.clearContext()
         }

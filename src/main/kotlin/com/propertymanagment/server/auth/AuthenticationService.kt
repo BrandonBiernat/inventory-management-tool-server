@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.http.HttpHeaders
+import java.time.LocalDateTime
 
 @Service
 class AuthenticationService(
@@ -85,6 +86,7 @@ class AuthenticationService(
         }
         validUserTokens.forEach {
             it.loggedOut = true
+            it.expirationDate = LocalDateTime.now()
         }
         tokenRepository.saveAll(validUserTokens)
     }
