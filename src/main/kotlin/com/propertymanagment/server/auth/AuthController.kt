@@ -17,8 +17,8 @@ class AuthController(
     fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok().body(authenticationService.register(request))
 
-    @PostMapping("/authenticate")
-    fun authenticate(@RequestBody request: AuthRequest): ResponseEntity<AuthenticationResponse> =
+    @PostMapping("/login")
+    fun login(@RequestBody request: AuthRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok().body(authenticationService.authenticate(request))
 
     @PostMapping("/refresh-token")

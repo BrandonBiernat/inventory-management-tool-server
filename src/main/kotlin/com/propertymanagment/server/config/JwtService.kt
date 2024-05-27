@@ -6,15 +6,16 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.security.Key
 import java.util.Date
-import java.util.function.Function
 
 @Service
 class JwtService {
-    private val secretKey: String = "5172513463384D6E4231744F39556F77556A366846577145496A696370674561"
+    @Value("\${jwt.secret}")
+    private lateinit var secretKey: String
     private val jwtExpiration: Long = 1000 * 60 * 60 * 24
     private val refreshExpiration: Long = 1000 * 60 * 60 * 24
 
