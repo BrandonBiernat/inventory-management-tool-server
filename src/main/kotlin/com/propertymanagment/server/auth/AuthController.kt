@@ -1,5 +1,6 @@
 package com.propertymanagment.server.auth
 
+import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
@@ -18,10 +19,16 @@ class AuthController(
     fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok().body(authenticationService.register(request))
 
-    @CrossOrigin(origins = ["http://localhost:3000"])
+    @CrossOrigin(origins = ["http://localhost:3000"], allowCredentials = "true")
     @PostMapping("/login")
-    fun login(@RequestBody request: AuthRequest): ResponseEntity<AuthenticationResponse> =
-        ResponseEntity.ok().body(authenticationService.authenticate(request))
+    fun login(@RequestBody request: AuthRequest, response: HttpServletResponse): ResponseEntity<Void> {
+        val authResponse = authenticationService.authenticate(request)
+        val cookie = Cookie("token", authResponse.token)
+        cookie.isHttpOnly = true
+        cookie.path = "/"
+        response.addCookie(cookie)
+        return ResponseEntity.ok().build()
+    }
 
     @PostMapping("/refresh-token")
     fun refreshToken(
