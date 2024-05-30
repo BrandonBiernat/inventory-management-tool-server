@@ -3,6 +3,7 @@ package com.propertymanagment.server.auth
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,6 +18,7 @@ class AuthController(
     fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok().body(authenticationService.register(request))
 
+    @CrossOrigin(origins = ["http://localhost:3000"])
     @PostMapping("/login")
     fun login(@RequestBody request: AuthRequest): ResponseEntity<AuthenticationResponse> =
         ResponseEntity.ok().body(authenticationService.authenticate(request))
