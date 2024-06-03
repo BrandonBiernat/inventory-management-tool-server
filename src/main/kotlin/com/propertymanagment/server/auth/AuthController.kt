@@ -15,19 +15,42 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
         private val authenticationService: AuthenticationService
 ) {
+    @CrossOrigin(origins = ["http://localhost:3000"], allowCredentials = "true")
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> =
-        ResponseEntity.ok().body(authenticationService.register(request))
+    fun register(@RequestBody request: RegisterRequest, response: HttpServletResponse): ResponseEntity<String> {
+        return try {
+            val authResponse = authenticationService.register(request)
+            val cookie = Cookie("token", authResponse.token)
+            cookie.isHttpOnly = true
+            cookie.path = "/"
+            response.addCookie(cookie)
+            ResponseEntity.ok().build()
+        } catch (ex: Exception) {
+            if(ex is IllegalStateException) {
+                ResponseEntity.badRequest().body(ex.message)
+            } else {
+                ResponseEntity.internalServerError().body(ex.message)
+            }
+        }
+    }
 
     @CrossOrigin(origins = ["http://localhost:3000"], allowCredentials = "true")
     @PostMapping("/login")
-    fun login(@RequestBody request: AuthRequest, response: HttpServletResponse): ResponseEntity<Void> {
-        val authResponse = authenticationService.authenticate(request)
-        val cookie = Cookie("token", authResponse.token)
-        cookie.isHttpOnly = true
-        cookie.path = "/"
-        response.addCookie(cookie)
-        return ResponseEntity.ok().build()
+    fun login(@RequestBody request: AuthRequest, response: HttpServletResponse): ResponseEntity<String> {
+        return try {
+            val authResponse = authenticationService.authenticate(request)
+            val cookie = Cookie("token", authResponse.token)
+            cookie.isHttpOnly = true
+            cookie.path = "/"
+            response.addCookie(cookie)
+            ResponseEntity.ok().build()
+        } catch (ex: Exception) {
+            if(ex is IllegalStateException) {
+                ResponseEntity.badRequest().body(ex.message)
+            } else {
+                ResponseEntity.internalServerError().body(ex.message)
+            }
+        }
     }
 
     @PostMapping("/refresh-token")

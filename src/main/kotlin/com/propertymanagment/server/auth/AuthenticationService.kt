@@ -25,6 +25,16 @@ class AuthenticationService(
         private val tokenRepository: TokenRepository
 ) {
     fun register(request: RegisterRequest): AuthenticationResponse {
+        val users = userRepository.findAll()
+        if(users.any { it.email == request.email }) {
+            throw IllegalStateException("Email already in use")
+        }
+        if(users.any { it.phoneNumber == request.phoneNumber }) {
+            throw IllegalStateException("Phone number already in use")
+        }
+        if(request.password != request.confirmPassword) {
+            throw IllegalStateException("Passwords do not match")
+        }
         val user = User(
             firstName = request.firstName,
             lastName = request.lastName,
@@ -48,7 +58,7 @@ class AuthenticationService(
             )
         )
         val user = userRepository.findByEmail(request.email)
-            .orElseThrow()
+                .orElseThrow { throw IllegalStateException("Email or password incorrect") }
         val jwtToken = jwtService.generateToken(user)
         val refreshToken = jwtService.generateRefreshToken(user)
         revokeAllUserTokens(user)
